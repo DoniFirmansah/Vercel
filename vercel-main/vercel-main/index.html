@@ -130,7 +130,8 @@
             
             <div class="row justify-content-center">
                 <div class="col-lg-10">
-                    <form id="formIjinKeluar">
+                    <!-- Menambahkan autocomplete="off" untuk mencegah browser mengisi otomatis -->
+                    <form id="formIjinKeluar" autocomplete="off">
                         <div class="mb-4">
                             <label for="namaGuru" class="form-label required">Nama Guru</label>
                             <select class="form-select" id="namaGuru" name="namaGuru" required>
@@ -397,9 +398,10 @@
         }
 
         async function loadDeskripsiTugas() {
+            // Fungsi ini tetap dipanggil agar tidak error, namun datanya tidak digunakan untuk autofill
             try {
                 const result = await apiCall('getAllDeskripsiTugas', 'GET');
-                console.log('Deskripsi list received:', result.data);
+                console.log('Deskripsi list received (unused):', result.data);
                 window.deskripsiData = result.data || [];
             } catch (error) {
                 console.error('Error loading deskripsi tugas:', error);
@@ -480,35 +482,22 @@
         }
 
         async function handleKelasChange(index, idKelas) {
-            if (!idKelas) {
-                const deskripsiTextarea = document.querySelector(`[name="deskripsiTugasKe${index}"]`);
-                const linkTugasInput = document.querySelector(`[name="linkTugasKe${index}"]`);
-                
-                if (deskripsiTextarea) deskripsiTextarea.value = '';
-                if (linkTugasInput) linkTugasInput.value = '';
-                return;
-            }
+            // Ambil elemen input
+            const deskripsiTextarea = document.querySelector(`[name="deskripsiTugasKe${index}"]`);
+            const linkTugasInput = document.querySelector(`[name="linkTugasKe${index}"]`);
             
-            try {
-                const result = await apiCall('getDeskripsiTugas', 'GET', { idKelas: idKelas });
-                const deskripsi = result.data;
-                
-                if (deskripsi) {
-                    // Auto-fill form dengan data yang sudah ada
-                    if (deskripsi.deskripsi) {
-                        document.querySelector(`[name="deskripsiTugasKe${index}"]`).value = deskripsi.deskripsi;
-                    }
-                    if (deskripsi.urlFoto) {
-                        document.querySelector(`[name="linkTugasKe${index}"]`).value = deskripsi.urlFoto;
-                    }
-                } else {
-                    // Clear form jika tidak ada data sebelumnya
-                    document.querySelector(`[name="deskripsiTugasKe${index}"]`).value = '';
-                    document.querySelector(`[name="linkTugasKe${index}"]`).value = '';
-                }
-            } catch (error) {
-                console.log('Error getting deskripsi: ' + error.message);
-            }
+            // Bersihkan (Kosongkan) input setiap kali kelas dipilih
+            if (deskripsiTextarea) deskripsiTextarea.value = '';
+            if (linkTugasInput) linkTugasInput.value = '';
+
+            // Jika tidak ada kelas yang dipilih (kembali ke "Pilih Kelas"), berhenti di sini
+            if (!idKelas) return;
+
+            // ---
+            // LOGIKA AUTO-FILL DIHAPUS
+            // Kita tidak melakukan fetch API lagi agar form tidak terisi otomatis.
+            // User harus mengisi deskripsi dan link secara manual setiap kali.
+            // ---
         }
 
         function previewFileKelas(index, file) {
