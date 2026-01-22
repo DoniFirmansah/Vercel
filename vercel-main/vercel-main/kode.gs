@@ -468,7 +468,8 @@ function requestDriveAuth() {
 function saveIjinKeluar(formData) {
   try {
     const sheet = sheetDb.getSheetByName("FormIjinKeluar");
-    if (!sheet) return "Sheet FormIjinKeluar tidak ditemukan"
+    if (!sheet) return "Sheet FormIjinKeluar tidak ditemukan";
+    
     const kelasData = getDataKelas();
     const kelasMap = {};
     kelasData.forEach(kelas => {
@@ -484,22 +485,30 @@ function saveIjinKeluar(formData) {
       formData.meninggalkanBerapaKelas
     ];
 
-    const jumlahKelas = parseInt(formData.meninggalkanBerapaKelas)
+    const jumlahKelas = parseInt(formData.meninggalkanBerapaKelas);
+    
     for (let i = 1; i <= jumlahKelas; i++) {
       const idKelas = formData[`kelas_id_diampuKe${i}`];
       const namaKelas = idKelas ? kelasMap[idKelas] : '';
       
-      rowData.push(namaKelas || '')
-      rowData.push(formData[`linkTugasKe${i}`] || '')
+      // Simpan ke sheet FormIjinKeluar
+      rowData.push(namaKelas || '');
+      rowData.push(formData[`linkTugasKe${i}`] || '');
+      
+      // Simpan ke sheet deskripsiTugas
       if (idKelas && namaKelas) {
         const deskripsiData = {
           id_kelas: idKelas, 
           deskripsi: formData[`deskripsiTugasKe${i}`] || `Tugas untuk ${namaKelas} - ${formData.keperluan}`,
-          urlFoto: formData[`urlFotoKe${i}`] || formData[`linkTugasKe${i}`] || ''
+          
+          // --- PERBAIKAN: urlFoto HANYA mengambil nilai upload. Jangan fallback ke linkTugas ---
+          urlFoto: formData[`urlFotoKe${i}`] || '' 
         };
         saveDeskripsiTugas(deskripsiData);
       }
     }
+
+    // Isi sisa kolom jika kurang dari 10 kelas
     const maxKelas = 10;
     for (let i = jumlahKelas + 1; i <= maxKelas; i++) {
       rowData.push('');
@@ -508,15 +517,20 @@ function saveIjinKeluar(formData) {
 
     rowData.push('');
 
-    sheet.appendRow(rowData)
+    sheet.appendRow(rowData);
+    
+    // Update warna jadwal
     resetWarnaJadwal();
-    warnaiJadwalIzinKeluar()
+    warnaiJadwalIzinKeluar();
+    
     return "Data izin keluar dan deskripsi tugas berhasil disimpan";
 
   } catch (error) {
+    Logger.log("Error in saveIjinKeluar: " + error.toString());
     return "Error: " + error.toString();
   }
 }
+
 function getAllDeskripsiTugas() {
   try {
     const sheet = sheetDb.getSheetByName("deskripsiTugas");
