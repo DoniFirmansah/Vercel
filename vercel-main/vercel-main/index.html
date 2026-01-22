@@ -22,12 +22,15 @@
             border-radius: 0.375rem;
             padding: 1rem;
             margin-top: 0.5rem;
+            display: none; /* Hidden by default */
         }
 
         .previewImage {
             max-width: 100%;
             height: auto;
             border-radius: 0.25rem;
+            max-height: 300px;
+            object-fit: contain;
         }
 
         .kelas-section {
@@ -36,6 +39,7 @@
             padding: 1rem;
             margin-bottom: 1rem;
             background-color: #f8f9fa;
+            position: relative;
         }
 
         .kelas-header {
@@ -264,7 +268,7 @@
             document.getElementById('closeBtn').addEventListener('click', function(e) {
                 e.preventDefault();
                 if (confirm('Apakah Anda yakin ingin menutup form?')) {
-                    // Simulasi penutupan window (pada environment nyata bisa menggunakan window.close())
+                    // Simulasi penutupan window
                     window.history.back();
                 }
             });
@@ -341,7 +345,6 @@
         function generateJumlahKelasOptions() {
             const select = document.getElementById('meninggalkanBerapaKelas');
             select.innerHTML = '<option value="">Pilih Jumlah Kelas</option>';
-            // Diubah dari 1 menjadi 0 untuk menambahkan opsi 0 Kelas
             for (let i = 0; i <= 9; i++) {
                 const opt = document.createElement("option");
                 opt.value = i;
@@ -379,8 +382,8 @@
             } catch (error) {
                 console.error('Error loading data guru:', error);
                 select.classList.remove('loading');
-                select.innerHTML = '<option value="">Error loading data</option>';
-                showAlert('Error loading data guru: ' + error.message, 'danger');
+                select.innerHTML = '<option value="">Gagal memuat data</option>';
+                showAlert('Gagal memuat data guru: ' + error.message, 'danger');
             }
         }
         
@@ -393,15 +396,14 @@
             } catch (error) {
                 console.error('Error loading data kelas:', error);
                 window.kelasData = [];
-                showAlert('Error loading data kelas: ' + error.message, 'danger');
+                showAlert('Gagal memuat data kelas: ' + error.message, 'danger');
             }
         }
 
         async function loadDeskripsiTugas() {
-            // Fungsi ini tetap dipanggil agar tidak error, namun datanya tidak digunakan untuk autofill
+            // Tetap dipanggil agar tidak error jika diperlukan di masa depan
             try {
                 const result = await apiCall('getAllDeskripsiTugas', 'GET');
-                console.log('Deskripsi list received (unused):', result.data);
                 window.deskripsiData = result.data || [];
             } catch (error) {
                 console.error('Error loading deskripsi tugas:', error);
@@ -413,7 +415,6 @@
             const container = document.getElementById('kelasContainer');
             container.innerHTML = ''; 
             
-            // Jika kosong atau 0, jangan render apapun
             if (!jumlahKelas || jumlahKelas === '' || parseInt(jumlahKelas) === 0) return;
 
             for (let i = 1; i <= parseInt(jumlahKelas); i++) {
@@ -456,23 +457,23 @@
                             <label class="form-label">Link Tugas (Opsional)</label>
                             <input type="url" class="form-control" name="linkTugasKe${i}" 
                                    placeholder="https://..." />
-                            <div class="form-text">Masukkan link tugas jika ada</div>
+                            <div class="form-text">Masukkan link tugas jika ada (Misal: Google Classroom/LMS)</div>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Upload Foto Tugas (Opsional)</label>
+                            <label class="form-label">Upload Foto/File Tugas (Opsional)</label>
                             <input type="file" class="form-control uploadFotoKelas" 
                                    name="uploadFotoKe${i}" 
                                    accept="image/*,.pdf,.doc,.docx"
                                    onchange="previewFileKelas(${i}, this.files[0])">
-                            <div class="form-text">Format: JPG, PNG, PDF, DOC (Maks. 5MB)</div>
+                            <div class="form-text">Format: JPG, PNG, PDF, DOC (Maks. 5MB). <br><strong>Tidak wajib mengisi.</strong></div>
                         </div>
 
-                        <div id="previewContainerKe${i}" class="previewContainer" style="display: none;">
-                            <label class="form-label">Preview:</label>
-                            <div class="border rounded p-2 text-center">
+                        <div id="previewContainerKe${i}" class="previewContainer">
+                            <label class="form-label">Preview File:</label>
+                            <div class="border rounded p-2 text-center bg-white">
                                 <img id="previewImageKe${i}" src="" alt="Preview" class="previewImage" style="display: none;">
-                                <div id="previewFileNameKe${i}" class="mt-2"></div>
+                                <div id="previewFileNameKe${i}" class="mt-2 fw-bold text-secondary"></div>
                             </div>
                         </div>
                     </div>
@@ -482,28 +483,29 @@
         }
 
         async function handleKelasChange(index, idKelas) {
-            // Ambil elemen input
+            // Bersihkan (Kosongkan) input setiap kali kelas dipilih agar bersih
             const deskripsiTextarea = document.querySelector(`[name="deskripsiTugasKe${index}"]`);
             const linkTugasInput = document.querySelector(`[name="linkTugasKe${index}"]`);
+            const fileInput = document.querySelector(`[name="uploadFotoKe${index}"]`);
             
-            // Bersihkan (Kosongkan) input setiap kali kelas dipilih
             if (deskripsiTextarea) deskripsiTextarea.value = '';
             if (linkTugasInput) linkTugasInput.value = '';
+            if (fileInput) fileInput.value = '';
+            
+            // Reset preview
+            document.getElementById(`previewContainerKe${index}`).style.display = 'none';
 
-            // Jika tidak ada kelas yang dipilih (kembali ke "Pilih Kelas"), berhenti di sini
+            // Jika tidak ada kelas yang dipilih, berhenti
             if (!idKelas) return;
 
-            // ---
-            // LOGIKA AUTO-FILL DIHAPUS
-            // Kita tidak melakukan fetch API lagi agar form tidak terisi otomatis.
-            // User harus mengisi deskripsi dan link secara manual setiap kali.
-            // ---
+            // Tidak ada autofill
         }
 
         function previewFileKelas(index, file) {
             const previewContainer = document.getElementById(`previewContainerKe${index}`);
             const previewImage = document.getElementById(`previewImageKe${index}`);
-            const previewFileName = document.getElementById(`previewFileNameKe${index}`);
+            const previewFileName = document.getElementById(`previewFileNameKe${i}`); // Typo fix: i -> index
+            const previewFileNameCorrect = document.getElementById(`previewFileNameKe${index}`);
             
             if (file) {
                 // Validasi ukuran file (max 5MB)
@@ -513,7 +515,7 @@
                 }
                 
                 previewContainer.style.display = 'block';
-                previewFileName.textContent = `${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+                previewFileNameCorrect.textContent = `${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
                 
                 if (file.type.startsWith('image/')) {
                     const reader = new FileReader();
@@ -544,7 +546,6 @@
                 meninggalkanPukul: form.meninggalkanPukul.value,
                 estimasiSelesaiPukul: form.estimasiSelesaiPukul.value,
                 meninggalkanBerapaKelas: form.meninggalkanBerapaKelas.value,
-                // Menambahkan data checkbox ke formData
                 checkSetujuKS: form.checkSetujuKS.checked,
                 checkBukuJurnal: form.checkBukuJurnal.checked
             };
@@ -565,43 +566,36 @@
                 return;
             }
 
-            // Validasi Checkbox (Browser validation usually handles this, but double check)
-            if (!formData.checkSetujuKS || !formData.checkBukuJurnal) {
-                showAlert('Mohon centang checklist administrasi sebelum submit.', 'danger');
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="bi bi-send-fill me-2"></i>Submit Izin Keluar';
-                return;
-            }
-
             const jumlahKelas = parseInt(formData.meninggalkanBerapaKelas);
             const uploadPromises = [];
 
-            // Kumpulkan data untuk setiap kelas
-            // Jika jumlahKelas 0, loop ini tidak akan berjalan
+            // Loop untuk setiap kelas
             for (let i = 1; i <= jumlahKelas; i++) {
-                const kelasData = {
-                    id_kelas: form[`kelas_id_diampuKe${i}`].value,
-                    deskripsi: form[`deskripsiTugasKe${i}`].value,
-                    linkTugas: form[`linkTugasKe${i}`].value
-                };
+                // Ambil data manual dari form (Link Tugas)
+                const kelasId = form[`kelas_id_diampuKe${i}`].value;
+                const deskripsi = form[`deskripsiTugasKe${i}`].value;
+                const linkTugas = form[`linkTugasKe${i}`].value; // Ambil Link Tugas
 
-                // Validasi setiap kelas (Link Tugas tidak wajib, jadi dihapus dari pengecekan)
-                if (!kelasData.id_kelas || !kelasData.deskripsi) {
+                // Validasi Input Form
+                if (!kelasId || !deskripsi) {
                     showAlert(`Data untuk kelas ke-${i} belum lengkap! Pastikan Kelas dan Deskripsi terisi.`, 'danger');
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = '<i class="bi bi-send-fill me-2"></i>Submit Izin Keluar';
                     return;
                 }
 
-                formData[`kelas_id_diampuKe${i}`] = kelasData.id_kelas;
-                formData[`linkTugasKe${i}`] = kelasData.linkTugas;
-                formData[`deskripsiTugasKe${i}`] = kelasData.deskripsi;
+                // Simpan ke object formData
+                formData[`kelas_id_diampuKe${i}`] = kelasId;
+                formData[`deskripsiTugasKe${i}`] = deskripsi;
+                formData[`linkTugasKe${i}`] = linkTugas;
 
+                // --- PERBAIKAN LOGIKA FILE ---
                 // Handle file upload untuk kelas ini
                 const fileInput = document.querySelector(`[name="uploadFotoKe${i}"]`);
                 const file = fileInput.files[0];
 
                 if (file) {
+                    // Jika ADA file, upload file
                     const uploadPromise = new Promise(async (resolve) => {
                         try {
                             const reader = new FileReader();
@@ -613,34 +607,39 @@
                                         fileName: file.name,
                                         mimeType: file.type
                                     });
+                                    // Jika upload sukses, isi urlFoto
                                     formData[`urlFotoKe${i}`] = uploadResult.data.url;
                                     resolve();
                                 } catch (error) {
-                                    console.log('Error uploading file: ' + error.message);
-                                    formData[`urlFotoKe${i}`] = '';
+                                    console.error('Error uploading file:', error);
+                                    showAlert('Gagal mengupload file kelas ke-' + i + ': ' + error.message, 'warning');
+                                    formData[`urlFotoKe${i}`] = ''; // Gagal upload, kosongkan
                                     resolve();
                                 }
                             };
                             reader.readAsDataURL(file);
                         } catch (error) {
-                            console.log('Error reading file: ' + error.message);
+                            console.error('Error reading file:', error);
                             formData[`urlFotoKe${i}`] = '';
                             resolve();
                         }
                     });
                     uploadPromises.push(uploadPromise);
                 } else {
-                    formData[`urlFotoKe${i}`] = '';
+                    // --- FIX UTAMA ---
+                    // Jika TIDAK ADA foto (user tidak isi), set urlFoto ke null/empty.
+                    // PENTING: JANGAN mengambil nilai dari linkTugas.
+                    formData[`urlFotoKe${i}`] = null;
                 }
             }
 
-            // Tunggu semua file upload selesai sebelum menyimpan
+            // Tunggu semua file upload selesai
             if (uploadPromises.length > 0) {
-                showAlert('Mengupload file...', 'info');
+                showAlert('Mengupload file, mohon tunggu sebentar...', 'info');
                 await Promise.all(uploadPromises);
             }
             
-            // Simpan data form
+            // Simpan data form utama
             try {
                 const result = await apiCall('saveIjinKeluar', 'POST', formData);
                 showAlert(result.message, 'success');
@@ -650,11 +649,8 @@
                 
                 // Reset form setelah submit
                 setTimeout(() => {
-                    document.getElementById('formIjinKeluar').reset();
+                    form.reset();
                     document.getElementById('kelasContainer').innerHTML = '';
-                    document.querySelectorAll('[id^="previewContainerKe"]').forEach(container => {
-                        container.style.display = 'none';
-                    });
                 }, 1000);
                 
                 submitBtn.disabled = false;
@@ -676,7 +672,6 @@
             `;
             container.appendChild(alert);
             
-            // Auto remove after 5 seconds
             setTimeout(function() {
                 if (alert.parentNode) {
                     alert.remove();
