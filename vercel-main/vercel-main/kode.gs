@@ -388,35 +388,42 @@ function getDeskripsiTugasByIdKelas(idKelas) {
 function saveDeskripsiTugas(deskripsiData) {
   try {
     const sheet = sheetDb.getSheetByName("deskripsiTugas");
-    if (!sheet) return "Sheet deskripsiTugas tidak ditemukan"
+    if (!sheet) return "Sheet deskripsiTugas tidak ditemukan";
+    
     const kelasData = getDataKelas();
     const kelasMap = {};
     kelasData.forEach(kelas => {
       kelasMap[kelas.id] = kelas.kelas;
-    })
-    const namaKelas = kelasMap[deskripsiData.id_kelas] || `Kelas ${deskripsiData.id_kelas}`;
+    });
+    
+    // Jika input ID numerik, ubah ke Nama Kelas
+    const namaKelas = kelasMap[deskripsiData.id_kelas] || deskripsiData.id_kelas.toString();
     
     const data = sheet.getDataRange().getValues();
-    let rowIndex = -1
+    let rowIndex = -1;
+    
+    // Cari apakah kelas sudah ada di list
     for (let i = 1; i < data.length; i++) {
       if (data[i][0] == namaKelas) {
-        rowIndex = i + 1; 
+        rowIndex = i + 1; // Baris di sheet (1-based index)
         break;
       }
     }
     
     if (rowIndex > 0) {
+      // Update baris yang sudah ada (Update Kolom A, B, C)
       sheet.getRange(rowIndex, 1, 1, 3).setValues([[
-        namaKelas,                   
-        deskripsiData.deskripsi,    
-        deskripsiData.urlFoto         
+        namaKelas,                   // Kolom A
+        deskripsiData.deskripsi,    // Kolom B
+        deskripsiData.urlFoto       // Kolom C
       ]]);
       Logger.log("Updated deskripsi for kelas: " + namaKelas);
     } else {
+      // Tambah baris baru (Append A, B, C)
       sheet.appendRow([
-        namaKelas,                    
-        deskripsiData.deskripsi,     
-        deskripsiData.urlFoto         
+        namaKelas,                   // Kolom A
+        deskripsiData.deskripsi,    // Kolom B
+        deskripsiData.urlFoto       // Kolom C
       ]);
       Logger.log("Added new deskripsi for kelas: " + namaKelas);
     }
@@ -426,6 +433,7 @@ function saveDeskripsiTugas(deskripsiData) {
     return "Error: " + error.toString();
   }
 }
+
 function uploadFile(fileContent, fileName, mimeType) {
   try {
     const folder = DriveApp.getFolderById(FOLDER_ID);
@@ -1036,32 +1044,23 @@ function getDeskripsiTugasByNamaKelas(namaKelas) {
     
     const data = sheet.getDataRange().getValues();
     
+    // Loop mulai dari baris ke-2 (index 1) karena baris ke-1 adalah header
     for (let i = 1; i < data.length; i++) {
+      // Cek Kolom A (index 0) apakah sama dengan namaKelas yang dicari
       if (data[i][0] == namaKelas) {
         return {
-          nama_kelas: data[i][0],
-          deskripsi: data[i][1] || '',
-          urlFoto: data[i][2] || ''
+          nama_kelas: data[i][0],       // Ambil dari Kolom A
+          deskripsi: data[i][1] || '',    // Ambil dari Kolom B
+          urlFoto: data[i][2] || ''      // Ambil dari Kolom C (URL Foto)
         };
       }
     }
-    return null;
+    return null; // Jika kelas tidak ditemukan
   } catch (error) {
     Logger.log("Error in getDeskripsiTugasByNamaKelas: " + error.toString());
     return null;
   }
 }
-
-function getTugasByKelas(namaKelas) {
-  try {
-    const allTugas = getTugasHariIni();
-    return allTugas.filter(tugas => tugas.namaKelas === namaKelas);
-  } catch (error) {
-    Logger.log("Error in getTugasByKelas: " + error.toString());
-    return [];
-  }
-}
-
 //===============testing tugas
 
 function testGetTugasHariIni() {
