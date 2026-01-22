@@ -1,0 +1,30 @@
+
+        body {
+            background-color: #ebe9f0;
+        }
+
+        .header {
+            background-color: #ebe9f0;
+            padding: 1rem;
+        }
+
+        .day-header {
+            background-color: #e9ecef;
+            position: sticky; 
+            top: 0; 
+            z-index: 11; 
+        }
+
+        .day-header th {
+            text-align: center;
+        }
+
+        .table-responsive {
+           
+            overflow-y: auto; 
+            scroll-behavior: smooth;
+            padding: 0;
+            position: relative;
+            border: 1px solid #dee2e6;
+        }
+

@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>SMK 9 | Form Izin Keluar Guru</title>
+    <base target="_top">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.slim.js" crossorigin="anonymous"></script>
+    
+    <style>
+        /* HIDE GOOGLE APPS SCRIPT BANNER */
+        .ss-attribution,
+        .ss-attribution-container,
+        [class*="ss-attribution"],
+        [id*="ss-attribution"],
+        div[style*="background-color: rgb(66, 133, 244)"],
+        div[style*="background-color: #4285f4"] {
+            display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            overflow: hidden !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        
+        /* Force mobile viewport */
+        html {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+        
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        html {
+            font-size: 16px; /* Base font size untuk mobile */
+            width: 100%;
+            height: 100%;
+        }
+        
+        body {
+            width: 100%;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow-x: hidden;
+            -webkit-text-size-adjust: 100%;
+            position: relative;
+        }
+        
+        /* Mobile First - Base styles untuk mobile */
+        @media screen and (max-width: 768px) {
+            html {
+                font-size: 14px; /* Lebih kecil untuk mobile */
+            }
+        }
+
+        /* Container utama - FULL WIDTH */
+        .main-container {
+            width: 100%;
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Header - Lebih besar */
+        .header-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 0;
+            flex: 1;
+            letter-spacing: 0.5px;
+        }
+
+        .close-btn {
+            font-size: 2rem;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+            padding: 0 0.5rem;
+            line-height: 1;
+            opacity: 0.9;
+        }
+
+        .close-btn:hover {
+            opacity: 1;
+        }
+
+        /* Form container - FULL WIDTH */
+        .form-wrapper {
+            background: white;
+            padding: 1.5rem;
+            margin: 0;
+            width: 100%;
+        }
+
+        /* Label lebih besar */
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+            color: #333;
+            display: block;
+        }
+
+        /* Input fields LEBIH BESAR */
+        .form-control, .form-select {
+            font-size: 1.1rem !important;
+            padding: 1rem 0.875rem !important;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            width: 100%;
+            min-height: 52px;
+            background-color: #fafafa;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            outline: none;
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            line-height: 1.6;
+            resize: vertical;
+        }
+
+        /* Time inputs lebih besar */
+        input[type="time"] {
+            font-size: 1.2rem !important;
+            padding: 1rem !important;
+            min-height: 56px;
+        }
+
+        /* File input lebih besar */
+        input[type="file"] {
+            font-size: 1rem !important;
+            padding: 0.875rem !important;
+            min-height: 56px;
+            cursor: pointer;
+        }
+
+        .required::after {
+            content: " *";
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        /* Spacing lebih besar */
+        .mb-3 {
+            margin-bottom: 1.75rem !important;
+        }
+
+        /* Kelas section */
+        .kelas-section {
+            border: 2px solid #e0e0e0;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to bottom, #f8f9ff 0%, #ffffff 100%);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .kelas-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3);
+        }
+
+        .kelas-header h6 {
+            margin: 0;
+            font-size: 1.15rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        /* Preview */
+        .previewContainer {
+            border: 2px dashed #ccc;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-top: 1rem;
+            background-color: #fafafa;
+        }
+
+        .previewImage {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Submit button BESAR */
+        .submit-btn {
+            width: 100%;
+            padding: 1.25rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            border-radius: 12px;
+            margin: 2rem 0 1rem 0;
+           
+            border: none;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+            min-height: 60px;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* Alert styling */
+        .alert {
+            font-size: 1.05rem;
+            padding: 1rem 1.25rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        /* Form text helper */
+        .form-text {
+            font-size: 0.95rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+
+        /* Modal styling */
+        .modal-content {
+            border-radius: 16px;
+            border: none;
+        }
+
+        .modal-header {
+            border-radius: 16px 16px 0 0;
+            padding: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .modal-body {
+            padding: 2rem;
+            font-size: 1.15rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: none;
+        }
+
+        .modal-footer .btn {
+            padding: 0.75rem 2rem;
+            font-size: 1.1rem;
+            border-radius: 10px;
+        }
+
+        /* Optimasi untuk layar sangat kecil */
+        @media (max-width: 375px) {
+            html {
+                font-size: 17px;
+            }
+            
+            .header-title {
+                font-size: 1.25rem;
+            }
+            
+            .form-label {
+                font-size: 1.05rem;
+            }
+            
+            .kelas-header h6 {
+                font-size: 1.05rem;
+            }
+        }
+
+        /* Optimasi untuk layar besar */
+        @media (min-width: 768px) {
+            .form-wrapper {
+                max-width: 1200px;
+                margin: 0 auto;
+                border-radius: 16px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            }
+            
+            .header-section {
+                border-radius: 16px 16px 0 0;
+            }
+        }
+
+        /* Landscape orientation */
+        @media (max-height: 2000px) and (orientation: landscape) {
+            .header-section {
+                padding: 1rem;
+            }
+            
+            .form-wrapper {
+                padding: 1rem;
+            }
+            
+            .mb-3 {
+                margin-bottom: 1.25rem !important;
+            }
+        }
+
+        /* Improve touch targets */
+        select, input, textarea, button {
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        /* Custom select arrow */
+        .form-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23333' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 18px 18px;
+            padding-right: 3rem;
+        }
+        
+        /* Mobile Responsive - Force mobile view */
+        @media screen and (max-width: 768px) {
+            body {
+                width: 100vw !important;
+                max-width: 100vw !important;
+                overflow-x: hidden !important;
+            }
+            
+            .main-container {
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            .form-wrapper {
+                padding: 1rem !important;
+                margin: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            
+            .header-section {
+                padding: 1rem 0.75rem !important;
+            }
+            
+            .header-title {
+                font-size: 1.1rem !important;
+            }
+            
+            .form-control, .form-select {
+                font-size: 16px !important; /* Prevent zoom on iOS */
+                padding: 0.875rem !important;
+                min-height: 48px !important;
+            }
+            
+            textarea.form-control {
+                min-height: 100px !important;
+            }
+            
+            input[type="time"] {
+                font-size: 16px !important; /* Prevent zoom on iOS */
+            }
+            
+            .kelas-section {
+                padding: 1rem !important;
+                margin-bottom: 1rem !important;
+            }
+            
+            .submit-btn {
+                padding: 1rem !important;
+                font-size: 1.1rem !important;
+                min-height: 56px !important;
+            }
+        }
+        
+        /* Extra small devices */
+        @media screen and (max-width: 375px) {
+            .form-wrapper {
+                padding: 0.75rem !important;
+            }
+            
+            .header-section {
+                padding: 0.75rem 0.5rem !important;
+            }
+            
+            .mb-3 {
+                margin-bottom: 1.25rem !important;
+            }
+        }
+    </style>
+    
+    <script>
+        // Hide Google Apps Script banner secara dinamis
+        (function() {
+            function hideBanner() {
+                // Hide berbagai variasi banner Google Apps Script
+                const selectors = [
+                    '.ss-attribution',
+                    '.ss-attribution-container',
+                    '[class*="ss-attribution"]',
+                    '[id*="ss-attribution"]',
+                    'div[style*="background-color: rgb(66, 133, 244)"]',
+                    'div[style*="background-color: #4285f4"]',
+                    'div[style*="background-color:rgb(66, 133, 244)"]'
+                ];
+                
+                selectors.forEach(selector => {
+                    try {
+                        const elements = document.querySelectorAll(selector);
+                        elements.forEach(el => {
+                            if (el && el.textContent && (
+                                el.textContent.includes('created by a Google Apps Script user') ||
+                                el.textContent.includes('Report abuse') ||
+                                el.textContent.includes('Learn more')
+                            )) {
+                                el.style.display = 'none';
+                                el.style.visibility = 'hidden';
+                                el.style.height = '0';
+                                el.style.overflow = 'hidden';
+                                el.style.margin = '0';
+                                el.style.padding = '0';
+                            }
+                        });
+                    } catch(e) {}
+                });
+                
+                const allDivs = document.querySelectorAll('div');
+                allDivs.forEach(div => {
+                    const text = div.textContent || '';
+                    if (text.includes('created by a Google Apps Script user') ||
+                        text.includes('Report abuse')) {
+                        div.style.display = 'none';
+                        div.style.visibility = 'hidden';
+                        div.style.height = '0';
+                        div.style.overflow = 'hidden';
+                    }
+                });
+            }
+            
+            hideBanner();
+            
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', hideBanner);
+            }
+            
+            window.addEventListener('load', hideBanner);
+            setInterval(hideBanner, 500);
+        })();
+        (function() {
+            const viewport = document.querySelector('meta[name="viewport"]');
+            if (viewport) {
+                viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes');
+            } else {
+                const meta = document.createElement('meta');
+                meta.name = 'viewport';
+                meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes';
+                document.getElementsByTagName('head')[0].appendChild(meta);
+            }
+        })();
+    </script>
+</head>
+
+<body>
+    <div class="main-container">
+        <!-- Header -->
+        <div class="header-section">
+            <div class="header-content">
+                <p class="header-title">Form Izin Keluar Guru</p>
+                <a href="#" class="close-btn" onclick="closeForm()">×</a>
+            </div>
+            <hr style="margin: 0.5rem 0 0 0;">
+        </div>
+
+        <!-- Form -->
+        <div class="form-wrapper">
+            <form id="formIjinKeluar">
+                <div class="mb-3">
+                    <label for="namaGuru" class="form-label required">Nama Guru</label>
+                    <select class="form-select" id="namaGuru" name="namaGuru" required>
+                        <option value="">Memuat data guru...</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="keperluan" class="form-label required">Keperluan</label>
+                    <textarea class="form-control" id="keperluan" name="keperluan" rows="3" required placeholder="Jelaskan keperluan izin keluar..."></textarea>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="meninggalkanPukul" class="form-label required">Meninggalkan Pukul</label>
+                    <input type="time" class="form-control" id="meninggalkanPukul" name="meninggalkanPukul" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="estimasiSelesaiPukul" class="form-label required">Estimasi Selesai Pukul</label>
+                    <input type="time" class="form-control" id="estimasiSelesaiPukul" name="estimasiSelesaiPukul" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="meninggalkanBerapaKelas" class="form-label">Meninggalkan Berapa Kelas</label>
+                    <select class="form-select" id="meninggalkanBerapaKelas" name="meninggalkanBerapaKelas">
+                        <option value="">Pilih Jumlah Kelas</option>
+                    </select>
+                </div>
+                
+                <div id="kelasContainer">
+                    <!-- Kelas akan ditambahkan secara dinamis -->
+                </div>
+                
+                <button type="submit" class="btn btn-primary submit-btn" id="submitBtn">
+                    Submit Izin Keluar
+                </button>
+            </form>
+            
+            <div id="alertContainer"></div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal fade" id="submitSuccessModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">Submit Berhasil</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center fs-5">
+                    Data izin berhasil disimpan!
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing form...');
+
+            window.kelasData = [];
+            window.deskripsiData = [];
+
+            generateJumlahKelasOptions();
+            loadDataGuru();
+            loadDataKelas();
+            loadDeskripsiTugas();
+            
+            document.getElementById('meninggalkanBerapaKelas').addEventListener('change', function() {
+                updateKelasFields(this.value);
+            });
+
+            document.getElementById('formIjinKeluar').addEventListener('submit', handleFormSubmit);
+        });
+
+        function closeForm() {
+            if (confirm('Yakin ingin menutup form? Data yang belum disimpan akan hilang.')) {
+                // Ganti dengan URL tujuan Anda
+                window.location.href = '/';
+            }
+        }
+
+        function generateJumlahKelasOptions() {
+            const select = document.getElementById('meninggalkanBerapaKelas');
+            select.innerHTML = '<option value="">Pilih Jumlah Kelas</option>';
+            for (let i = 1; i <= 9; i++) {
+                const opt = document.createElement("option");
+                opt.value = i;
+                opt.textContent = `${i} Kelas`;
+                select.appendChild(opt);
+            }
+        }
+
+        function loadDataGuru() {
+            console.log('Loading data guru...');
+            const select = document.getElementById('namaGuru');
+            
+            select.innerHTML = '<option value="">Memuat data guru...</option>';
+            select.classList.add('loading');
+            
+            google.script.run
+                .withSuccessHandler(function(guruList) {
+                    console.log('Guru list received:', guruList);
+                    select.classList.remove('loading');
+                    select.innerHTML = '<option value="">Pilih Guru</option>';
+                    
+                    if (guruList && guruList.length > 0) {
+                        guruList.forEach(function(guru) {
+                            if (guru.nama && guru.nama.trim() !== '') {
+                                const option = document.createElement('option');
+                                option.value = guru.nama;
+                                option.textContent = guru.nama;
+                                select.appendChild(option);
+                            }
+                        });
+                        console.log(`Loaded ${guruList.length} guru options`);
+                    } else {
+                        select.innerHTML = '<option value="">Tidak ada data guru</option>';
+                        console.warn('No guru data found');
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    console.error('Error loading data guru:', error);
+                    select.classList.remove('loading');
+                    select.innerHTML = '<option value="">Error loading data</option>';
+                    showAlert('Error loading data guru: ' + error, 'danger');
+                })
+                .getDataGuru();
+        }
+        
+        function loadDataKelas() {
+            console.log('Loading data kelas...');
+            google.script.run
+                .withSuccessHandler(function(kelasList) {
+                    console.log('Kelas list received:', kelasList);
+                    window.kelasData = kelasList || [];
+                })
+                .withFailureHandler(function(error) {
+                    console.error('Error loading data kelas:', error);
+                    window.kelasData = [];
+                    showAlert('Error loading data kelas: ' + error, 'danger');
+                })
+                .getDataKelas();
+        }
+
+        function loadDeskripsiTugas() {
+            google.script.run
+                .withSuccessHandler(function(deskripsiList) {
+                    console.log('Deskripsi list received:', deskripsiList);
+                    window.deskripsiData = deskripsiList || [];
+                })
+                .withFailureHandler(function(error) {
+                    console.error('Error loading deskripsi tugas:', error);
+                    window.deskripsiData = [];
+                })
+                .getAllDeskripsiTugas();
+        }
+
+        function updateKelasFields(jumlahKelas) {
+            const container = document.getElementById('kelasContainer');
+            container.innerHTML = ''; 
+            
+            if (!jumlahKelas || jumlahKelas === '') return;
+
+            for (let i = 1; i <= parseInt(jumlahKelas); i++) {
+                const kelasOptions = window.kelasData && window.kelasData.length > 0 
+                    ? window.kelasData.map(k => `<option value="${k.id}">${k.kelas}</option>`).join('')
+                    : '<option value="">Memuat data kelas...</option>';
+                
+                const kelasHtml = `
+                    <div class="kelas-section">
+                        <div class="kelas-header">
+                            <h6>Kelas yang Ditinggalkan Ke-${i}</h6>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label required">Pilih Kelas</label>
+                            <select class="form-select kelas-select" name="kelas_id_diampuKe${i}" required 
+                                    onchange="handleKelasChange(${i}, this.value)">
+                                <option value="">Pilih Kelas</option>
+                                ${kelasOptions}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label required">Deskripsi Tugas</label>
+                            <textarea class="form-control" name="deskripsiTugasKe${i}" rows="3" 
+                                      placeholder="Deskripsi tugas untuk kelas ini..." required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label required">Link Tugas</label>
+                            <input type="url" class="form-control" name="linkTugasKe${i}" 
+                                   placeholder="https://..." required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Upload Foto Tugas (Opsional)</label>
+                            <input type="file" class="form-control uploadFotoKelas" 
+                                   name="uploadFotoKe${i}" 
+                                   accept="image/*,.pdf,.doc,.docx"
+                                   onchange="previewFileKelas(${i}, this.files[0])">
+                            <div class="form-text">Format: JPG, PNG, PDF, DOC (Maks. 5MB)</div>
+                        </div>
+
+                        <div id="previewContainerKe${i}" class="previewContainer" style="display: none;">
+                            <label class="form-label">Preview:</label>
+                            <div class="border rounded p-2 text-center">
+                                <img id="previewImageKe${i}" src="" alt="Preview" class="previewImage" style="display: none;">
+                                <div id="previewFileNameKe${i}" class="mt-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', kelasHtml);
+            }
+        }
+
+        function handleKelasChange(index, idKelas) {
+            if (!idKelas) {
+                const deskripsiTextarea = document.querySelector(`[name="deskripsiTugasKe${index}"]`);
+                const linkTugasInput = document.querySelector(`[name="linkTugasKe${index}"]`);
+                if (deskripsiTextarea) deskripsiTextarea.value = '';
+                if (linkTugasInput) linkTugasInput.value = '';
+                return;
+            }
+            
+            google.script.run
+                .withSuccessHandler(function(deskripsi) {
+                    if (deskripsi) {
+                        if (deskripsi.deskripsi) {
+                            document.querySelector(`[name="deskripsiTugasKe${index}"]`).value = deskripsi.deskripsi;
+                        }
+                        if (deskripsi.urlFoto) {
+                            document.querySelector(`[name="linkTugasKe${index}"]`).value = deskripsi.urlFoto;
+                        }
+                    } else {
+                        document.querySelector(`[name="deskripsiTugasKe${index}"]`).value = '';
+                        document.querySelector(`[name="linkTugasKe${index}"]`).value = '';
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    console.log('Error getting deskripsi: ' + error);
+                })
+                .getDeskripsiTugasByIdKelas(idKelas);
+        }
+
+        function previewFileKelas(index, file) {
+            const previewContainer = document.getElementById(`previewContainerKe${index}`);
+            const previewImage = document.getElementById(`previewImageKe${index}`);
+            const previewFileName = document.getElementById(`previewFileNameKe${index}`);
+            
+            if (file) {
+                previewContainer.style.display = 'block';
+                previewFileName.textContent = file.name;
+                
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImage.src = e.target.result;
+                        previewImage.style.display = 'block';
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    previewImage.style.display = 'none';
+                }
+            } else {
+                previewContainer.style.display = 'none';
+            }
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Menyimpan...';
+
+            const formData = {
+                namaGuru: form.namaGuru.value,
+                keperluan: form.keperluan.value,
+                meninggalkanPukul: form.meninggalkanPukul.value,
+                estimasiSelesaiPukul: form.estimasiSelesaiPukul.value,
+                meninggalkanBerapaKelas: form.meninggalkanBerapaKelas.value
+            };
+
+            if (formData.meninggalkanPukul >= formData.estimasiSelesaiPukul) {
+                showAlert('Waktu estimasi selesai harus setelah waktu meninggalkan!', 'danger');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Izin Keluar';
+                return;
+            }
+
+            const jumlahKelas = parseInt(formData.meninggalkanBerapaKelas);
+            const uploadPromises = [];
+
+            for (let i = 1; i <= jumlahKelas; i++) {
+                const kelasData = {
+                    id_kelas: form[`kelas_id_diampuKe${i}`].value,
+                    deskripsi: form[`deskripsiTugasKe${i}`].value,
+                    linkTugas: form[`linkTugasKe${i}`].value
+                };
+
+                if (!kelasData.id_kelas || !kelasData.deskripsi || !kelasData.linkTugas) {
+                    showAlert(`Data untuk kelas ke-${i} belum lengkap!`, 'danger');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Izin Keluar';
+                    return;
+                }
+
+                formData[`kelas_id_diampuKe${i}`] = kelasData.id_kelas;
+                formData[`linkTugasKe${i}`] = kelasData.linkTugas;
+                formData[`deskripsiTugasKe${i}`] = kelasData.deskripsi;
+
+                const fileInput = document.querySelector(`[name="uploadFotoKe${i}"]`);
+                const file = fileInput.files[0];
+
+                if (file) {
+                    const uploadPromise = new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const fileContent = e.target.result.split(',')[1];
+                            google.script.run
+                                .withSuccessHandler(function(fileUrl) {
+                                    formData[`urlFotoKe${i}`] = fileUrl;
+                                    resolve();
+                                })
+                                .withFailureHandler(function(error) {
+                                    console.log('Error uploading file: ' + error);
+                                    formData[`urlFotoKe${i}`] = '';
+                                    resolve();
+                                })
+                                .uploadFile(fileContent, file.name, file.type);
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                    uploadPromises.push(uploadPromise);
+                } else {
+                    formData[`urlFotoKe${i}`] = '';
+                }
+            }
+
+            if (uploadPromises.length > 0) {
+                showAlert('Mengupload file...', 'info');
+                Promise.all(uploadPromises).then(() => {
+                    saveFormData(formData, submitBtn);
+                });
+            } else {
+                saveFormData(formData, submitBtn);
+            }
+        }
+
+        function saveFormData(formData, submitBtn) {
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    showAlert(result, 'success');
+                    const modal = new bootstrap.Modal(document.getElementById('submitSuccessModal'));
+                    modal.show();
+                    document.getElementById('formIjinKeluar').reset();
+                    document.getElementById('kelasContainer').innerHTML = '';
+                    document.querySelectorAll('[id^="previewContainerKe"]').forEach(container => {
+                        container.style.display = 'none';
+                    });
+                    
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Submit Izin Keluar';
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    showAlert('Error: ' + error, 'danger');
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Submit Izin Keluar';
+                    }
+                })
+                .saveIjinKeluar(formData);
+        }
+        
+        function showAlert(message, type) {
+            const container = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} alert-dismissible fade show`;
+            alert.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            container.appendChild(alert);
+            
+            setTimeout(function() {
+                if (alert.parentNode) {
+                    alert.remove();
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

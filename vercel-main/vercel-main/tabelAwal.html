@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMK 9 | Jurnal Mengajar Guru</title>
+    <?!= include('stylesheet'); ?>
+    <base target="_top">
+
+</head>
+
+<body style="background-color: #e9ecef;">
+
+
+    <div class="container shadow bg-light rounded py-5 mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-12 mb-3">
+               
+                <div class="container mt-3">
+                    <div class="row justify-content-between ">
+                        <!-- Judul Diatas -->
+                        <div class="col-10">
+                          <h4>
+                <marquee behavior="" scrollamount="12" align="center" direction=""
+                  >Input data yang dilakukan tidak sesuai harinya akan menyebabkan blok warna tidak sesuai dengan data yang tampil</marquee
+                >
+              </h4>
+                            <!-- <h1 class="fw-bold fs-3 mb-2 ">Jurnal Mengajar Guru</h1> -->
+                            <h2>Jurnal Guru SMKN 9 Semarang | <span id="p1" class="fs-5 fw-bold text-danger"></span></h2>
+                        </div>
+                        <!-- Tombol Kembali -->
+                        <div class="col-2 col-2 text-center">
+                            <a  href="<?= myUrl()?>" class="text-decoration-none text-uppercase">
+                                <h1 class="fw-bold fs-1 mb-2">X</h1>
+                            </a>
+                        </div>
+                        <hr>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="row justify-content-center column-gap-5 text-center m-2">
+            <!-- Isi Konten -->
+            <!-- <div class="col-6">
+                <h1>Isi Konten</h1>
+            </div> -->
+        <!-- </div> -->
+        <div class="container timetable header rounded p-4 shadow">   
+          <div class="table-responsive" id="scroll-container">  
+              <table class="table table-bordered border-dark rounded table-striped table" id="timetable">
+              </table>
+          </div>
+        </div>
+    </div>
+
+    <script>
+          $(document).ready(function () {
+            var $scrollContainer = $('#scroll-container');
+            var scrollSpeed = 1; // Kecepatan scroll
+            var scrollAmount = 1; // Jumlah piksel untuk digulir
+            var scrollInterval; // Variabel untuk menyimpan interval
+            var autoScrollDirection = 'down'; // Arah scroll otomatis
+
+            function startAutoScroll() {
+                scrollInterval = setInterval(function () {
+                    var currentScrollTop = $scrollContainer.scrollTop();
+                    var containerHeight = $scrollContainer.innerHeight();
+                    var scrollHeight = $scrollContainer[0].scrollHeight;
+
+                    if (autoScrollDirection === 'down') {
+                        $scrollContainer.scrollTop(currentScrollTop + scrollAmount);
+
+                        // Jika sudah mencapai bawah, reset ke atas
+                        if (currentScrollTop + containerHeight >= scrollHeight - 20) {
+                            autoScrollDirection = 'up'; // Ubah arah scroll otomatis ke atas
+                        }
+                    } else {
+                        $scrollContainer.scrollTop(currentScrollTop - scrollAmount);
+
+                        // Jika sudah mencapai atas, reset ke bawah
+                        if (currentScrollTop <= 0) {
+                            autoScrollDirection = 'down'; // Ubah arah scroll otomatis ke bawah
+                        }
+                    }
+                }, scrollSpeed);
+               
+            }
+
+            $scrollContainer.on('scroll', function () {
+                clearInterval(scrollInterval); // Hentikan scroll otomatis
+                // Ubah arah scroll otomatis berdasarkan arah scroll pengguna
+                var currentScrollTop = $scrollContainer.scrollTop();
+                if (currentScrollTop > this.lastScrollTop) {
+                    autoScrollDirection = 'down'; // Pengguna scroll ke bawah
+                } else {
+                    autoScrollDirection = 'up'; // Pengguna scroll ke atas
+                }
+                this.lastScrollTop = currentScrollTop; // Simpan posisi terakhir scroll
+                startAutoScroll(); // Mulai kembali animasi scroll otomatis
+            });
+
+            // Mulai scroll otomatis
+            startAutoScroll();
+        });
+
+
+     
+        var previousData = [];
+        var selectedSheet = '';
+
+        document.getElementById("p1").innerHTML = getTanggal();
+
+        function getTanggal() {
+            var date = new Date();
+            var day = date.getDate();
+            var month = date.getMonth();
+            var year = date.getFullYear();
+            var bulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"][month];
+            return `${day} ${bulan} ${year}`;
+        }
+
+        function fetchData() {
+            google.script.run.withSuccessHandler(function (data) {
+                updateTable(data[0], data[1]);
+                Swal.close(); 
+            }).getDataWithColors();
+        }
+
+
+        function updateTable(data, colors) {
+          var table = document.getElementById('timetable');
+          table.innerHTML = '';
+
+          var header = '<tr class="day-header">';
+          header += `<th style="background-color: #f0ad4e; font-size: 15px; white-space: nowrap;" class="text-center pt-1 border border-black">NAMA GURU / JAM</th>`;
+          data[0].slice(1).forEach(function(col, index) {
+              header += `<th style="background-color: #5bc0de; font-size: 15px;">${col}</th>`;
+          });
+          header += '</tr>';
+          table.innerHTML += header;
+
+          var dataColors = colors.slice(1);
+          data.slice(1).forEach(function(row, rowIndex) {
+              var rowHTML = '<tr>';
+              var rowColors = dataColors[rowIndex];
+              row.forEach(function(cell, colIndex) {
+                  var color = rowColors[colIndex];
+                  rowHTML += `<td style="background-color: ${color}; font-size: 10px;">${cell}</td>`;
+              });
+              rowHTML += '</tr>';
+              table.innerHTML += rowHTML;
+          });
+        }
+
+        fetchData();
+        setInterval(fetchData, 1000); 
+
+    </script>  
+
+    <?!= include('javascript'); ?>
+
+
+</body>
+
+</html>
+

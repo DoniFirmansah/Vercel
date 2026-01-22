@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMK 9 | Form Izin Keluar Guru</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <style>
+        body {
+            background-color: #e9ecef;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .previewContainer {
+            border: 2px dashed #dee2e6;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .previewImage {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.25rem;
+        }
+
+        .kelas-section {
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background-color: #f8f9fa;
+        }
+
+        .kelas-header {
+            background-color: #e9ecef;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            margin-bottom: 1rem;
+        }
+        
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        .required::after {
+            content: " *";
+            color: red;
+        }
+
+        .container-main {
+            max-width: 900px;
+            margin: 2rem auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        @media (max-width: 768px) {
+            .container-main {
+                margin: 1rem;
+            }
+        }
+
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .btn-submit {
+            min-height: 50px;
+            font-size: 1.1rem;
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+
+        .btn-submit:hover {
+            background-color: #0b5ed7;
+            border-color: #0a58ca;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        .modal-header.bg-success {
+            background-color: #198754 !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-main p-0">
+        <div class="container-fluid p-4">
+            <div class="row justify-content-center">
+                <div class="col-lg-12 mb-3">
+                    <div class="container mt-2">
+                        <div class="row justify-content-between align-items-center mb-4">
+                            <div class="col-10">
+                                <h2 class="fw-bold mb-2 text-primary">
+                                    <i class="bi bi-person-walking me-2"></i>Form Izin Keluar Guru
+                                </h2>
+                                <p class="text-muted">SMK Negeri 9</p>
+                            </div>
+                            <div class="col-2 text-end">
+                                <a href="#" id="closeBtn" class="text-decoration-none text-dark" title="Tutup">
+                                    <i class="bi bi-x-lg fs-3"></i>
+                                </a>
+                            </div>
+                            <hr class="mt-3">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <form id="formIjinKeluar">
+                        <div class="mb-4">
+                            <label for="namaGuru" class="form-label required">Nama Guru</label>
+                            <select class="form-select" id="namaGuru" name="namaGuru" required>
+                                <option value="">Memuat data guru...</option>
+                            </select>
+                            <div class="form-text">Pilih nama guru dari daftar</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="keperluan" class="form-label required">Keperluan</label>
+                            <textarea class="form-control" id="keperluan" name="keperluan" rows="3" required 
+                                      placeholder="Jelaskan keperluan izin keluar..."></textarea>
+                            <div class="form-text">Deskripsikan keperluan izin keluar dengan jelas</div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label for="meninggalkanPukul" class="form-label required">Meninggalkan Pukul</label>
+                                <input type="time" class="form-control" id="meninggalkanPukul" name="meninggalkanPukul" required>
+                                <div class="form-text">Waktu mulai izin</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="estimasiSelesaiPukul" class="form-label required">Estimasi Selesai Pukul</label>
+                                <input type="time" class="form-control" id="estimasiSelesaiPukul" name="estimasiSelesaiPukul" required>
+                                <div class="form-text">Perkiraan waktu kembali</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="meninggalkanBerapaKelas" class="form-label">Meninggalkan Berapa Kelas</label>
+                            <select class="form-select" id="meninggalkanBerapaKelas" name="meninggalkanBerapaKelas">
+                                <option value="">Pilih Jumlah Kelas</option>
+                            </select>
+                            <div class="form-text">Pilih jumlah kelas yang akan ditinggalkan</div>
+                        </div>
+                        
+                        <div class="row mb-4" id="kelasContainer">
+                            <!-- Kelas akan ditambahkan secara dinamis berdasarkan pilihan -->
+                        </div>
+                        
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg btn-submit" id="submitBtn">
+                                <i class="bi bi-send-fill me-2"></i>Submit Izin Keluar
+                            </button>
+                            <button type="reset" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-clockwise me-2"></i>Reset Form
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div id="alertContainer" class="mt-4"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal fade" id="submitSuccessModal" tabindex="-1" aria-labelledby="submitSuccessLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="submitSuccessLabel">
+                        <i class="bi bi-check-circle-fill me-2"></i>Submit Berhasil
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center fs-5">
+                    <i class="bi bi-check-circle text-success" style="font-size: 3rem;"></i>
+                    <p class="mt-3">Data izin berhasil disimpan!</p>
+                    <p class="text-muted">Silakan tunggu persetujuan dari admin.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">
+                        <i class="bi bi-check-lg me-1"></i>OK
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // ============= CONFIGURATION =============
+        const API_BASE_URL = '/api/guruizin';
+        
+        // ============= INITIALIZATION =============
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing form...');
+
+            window.kelasData = [];
+            window.deskripsiData = [];
+
+            generateJumlahKelasOptions();
+            loadDataGuru();
+            loadDataKelas();
+            loadDeskripsiTugas();
+            
+            document.getElementById('meninggalkanBerapaKelas').addEventListener('change', function() {
+                updateKelasFields(this.value);
+            });
+
+            document.getElementById('formIjinKeluar').addEventListener('submit', handleFormSubmit);
+            
+            // Reset form button
+            document.querySelector('button[type="reset"]').addEventListener('click', function() {
+                document.getElementById('kelasContainer').innerHTML = '';
+            });
+            
+            document.getElementById('closeBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                if (confirm('Apakah Anda yakin ingin menutup form?')) {
+                    // Simulasi penutupan window (pada environment nyata bisa menggunakan window.close())
+                    window.history.back();
+                }
+            });
+        });
+
+        // ============= API HELPER FUNCTIONS =============
+        async function apiCall(action, method = 'GET', data = null) {
+            try {
+                const url = API_BASE_URL;
+                
+                const options = {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                };
+                
+                if (method === 'GET') {
+                    const params = new URLSearchParams();
+                    params.append('action', action);
+                    if (data) {
+                        Object.keys(data).forEach(key => {
+                            if (data[key] !== null && data[key] !== undefined) {
+                                params.append(key, data[key]);
+                            }
+                        });
+                    }
+                    
+                    const response = await fetch(`${url}?${params.toString()}`, {
+                        method: 'GET',
+                        cache: 'no-cache'
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const result = await response.json();
+                    
+                    if (!result.success) {
+                        throw new Error(result.error || result.message || 'Request failed');
+                    }
+                    
+                    return result;
+                } else if (method === 'POST') {
+                    const body = {
+                        action: action,
+                        ...data
+                    };
+                    
+                    options.body = JSON.stringify(body);
+                    
+                    const response = await fetch(url, options);
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const result = await response.json();
+                    
+                    if (!result.success) {
+                        throw new Error(result.error || result.message || 'Request failed');
+                    }
+                    
+                    return result;
+                }
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
+            }
+        }
+
+        // ============= FORM FUNCTIONS =============
+        function generateJumlahKelasOptions() {
+            const select = document.getElementById('meninggalkanBerapaKelas');
+            select.innerHTML = '<option value="">Pilih Jumlah Kelas</option>';
+            for (let i = 1; i <= 9; i++) {
+                const opt = document.createElement("option");
+                opt.value = i;
+                opt.textContent = `${i} Kelas`;
+                select.appendChild(opt);
+            }
+        }
+
+        async function loadDataGuru() {
+            console.log('Loading data guru...');
+            const select = document.getElementById('namaGuru');
+            
+            select.innerHTML = '<option value="">Memuat data guru...</option>';
+            select.classList.add('loading');
+            
+            try {
+                const result = await apiCall('getDataGuru', 'GET');
+                select.classList.remove('loading');
+                select.innerHTML = '<option value="">Pilih Guru</option>';
+                
+                if (result.data && result.data.length > 0) {
+                    result.data.forEach(function(guru) {
+                        if (guru.nama && guru.nama.trim() !== '') {
+                            const option = document.createElement('option');
+                            option.value = guru.nama;
+                            option.textContent = guru.nama;
+                            select.appendChild(option);
+                        }
+                    });
+                    console.log(`Loaded ${result.data.length} guru options`);
+                } else {
+                    select.innerHTML = '<option value="">Tidak ada data guru</option>';
+                    console.warn('No guru data found');
+                }
+            } catch (error) {
+                console.error('Error loading data guru:', error);
+                select.classList.remove('loading');
+                select.innerHTML = '<option value="">Error loading data</option>';
+                showAlert('Error loading data guru: ' + error.message, 'danger');
+            }
+        }
+        
+        async function loadDataKelas() {
+            console.log('Loading data kelas...');
+            try {
+                const result = await apiCall('getDataKelas', 'GET');
+                console.log('Kelas list received:', result.data);
+                window.kelasData = result.data || [];
+            } catch (error) {
+                console.error('Error loading data kelas:', error);
+                window.kelasData = [];
+                showAlert('Error loading data kelas: ' + error.message, 'danger');
+            }
+        }
+
+        async function loadDeskripsiTugas() {
+            try {
+                const result = await apiCall('getAllDeskripsiTugas', 'GET');
+                console.log('Deskripsi list received:', result.data);
+                window.deskripsiData = result.data || [];
+            } catch (error) {
+                console.error('Error loading deskripsi tugas:', error);
+                window.deskripsiData = [];
+            }
+        }
+
+        function updateKelasFields(jumlahKelas) {
+            const container = document.getElementById('kelasContainer');
+            container.innerHTML = ''; 
+            
+            if (!jumlahKelas || jumlahKelas === '') return;
+
+            for (let i = 1; i <= parseInt(jumlahKelas); i++) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'col-12 mb-3';
+                
+                // Generate options for kelas select
+                let kelasOptions = '<option value="">Pilih Kelas</option>';
+                if (window.kelasData && window.kelasData.length > 0) {
+                    window.kelasData.forEach(k => {
+                        kelasOptions += `<option value="${k.id}">${k.kelas}</option>`;
+                    });
+                } else {
+                    kelasOptions += '<option value="">Memuat data kelas...</option>';
+                }
+                
+                wrapper.innerHTML = `
+                    <div class="kelas-section">
+                        <div class="kelas-header">
+                            <h6 class="mb-0 fw-bold">
+                                <i class="bi bi-mortarboard-fill me-2"></i>Kelas yang Ditinggalkan Ke-${i}
+                            </h6>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label required">Pilih Kelas</label>
+                            <select class="form-select kelas-select" name="kelas_id_diampuKe${i}" required 
+                                    onchange="handleKelasChange(${i}, this.value)">
+                                ${kelasOptions}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label required">Deskripsi Tugas</label>
+                            <textarea class="form-control" name="deskripsiTugasKe${i}" rows="3" 
+                                      placeholder="Deskripsi tugas untuk kelas ini..." required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label required">Link Tugas</label>
+                            <input type="url" class="form-control" name="linkTugasKe${i}" 
+                                   placeholder="https://..." required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Upload Foto Tugas (Opsional)</label>
+                            <input type="file" class="form-control uploadFotoKelas" 
+                                   name="uploadFotoKe${i}" 
+                                   accept="image/*,.pdf,.doc,.docx"
+                                   onchange="previewFileKelas(${i}, this.files[0])">
+                            <div class="form-text">Format: JPG, PNG, PDF, DOC (Maks. 5MB)</div>
+                        </div>
+
+                        <div id="previewContainerKe${i}" class="previewContainer" style="display: none;">
+                            <label class="form-label">Preview:</label>
+                            <div class="border rounded p-2 text-center">
+                                <img id="previewImageKe${i}" src="" alt="Preview" class="previewImage" style="display: none;">
+                                <div id="previewFileNameKe${i}" class="mt-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(wrapper);
+            }
+        }
+
+        async function handleKelasChange(index, idKelas) {
+            if (!idKelas) {
+                const deskripsiTextarea = document.querySelector(`[name="deskripsiTugasKe${index}"]`);
+                const linkTugasInput = document.querySelector(`[name="linkTugasKe${index}"]`);
+                
+                if (deskripsiTextarea) deskripsiTextarea.value = '';
+                if (linkTugasInput) linkTugasInput.value = '';
+                return;
+            }
+            
+            try {
+                const result = await apiCall('getDeskripsiTugas', 'GET', { idKelas: idKelas });
+                const deskripsi = result.data;
+                
+                if (deskripsi) {
+                    // Auto-fill form dengan data yang sudah ada
+                    if (deskripsi.deskripsi) {
+                        document.querySelector(`[name="deskripsiTugasKe${index}"]`).value = deskripsi.deskripsi;
+                    }
+                    if (deskripsi.urlFoto) {
+                        document.querySelector(`[name="linkTugasKe${index}"]`).value = deskripsi.urlFoto;
+                    }
+                } else {
+                    // Clear form jika tidak ada data sebelumnya
+                    document.querySelector(`[name="deskripsiTugasKe${index}"]`).value = '';
+                    document.querySelector(`[name="linkTugasKe${index}"]`).value = '';
+                }
+            } catch (error) {
+                console.log('Error getting deskripsi: ' + error.message);
+            }
+        }
+
+        function previewFileKelas(index, file) {
+            const previewContainer = document.getElementById(`previewContainerKe${index}`);
+            const previewImage = document.getElementById(`previewImageKe${index}`);
+            const previewFileName = document.getElementById(`previewFileNameKe${index}`);
+            
+            if (file) {
+                // Validasi ukuran file (max 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    showAlert('Ukuran file terlalu besar. Maksimal 5MB.', 'warning');
+                    return;
+                }
+                
+                previewContainer.style.display = 'block';
+                previewFileName.textContent = `${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+                
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImage.src = e.target.result;
+                        previewImage.style.display = 'block';
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    previewImage.style.display = 'none';
+                }
+            } else {
+                previewContainer.style.display = 'none';
+            }
+        }
+
+        async function handleFormSubmit(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...';
+
+            const formData = {
+                namaGuru: form.namaGuru.value,
+                keperluan: form.keperluan.value,
+                meninggalkanPukul: form.meninggalkanPukul.value,
+                estimasiSelesaiPukul: form.estimasiSelesaiPukul.value,
+                meninggalkanBerapaKelas: form.meninggalkanBerapaKelas.value
+            };
+
+            // Validasi dasar
+            if (!formData.namaGuru || !formData.keperluan || !formData.meninggalkanPukul || !formData.estimasiSelesaiPukul) {
+                showAlert('Harap isi semua field yang wajib diisi!', 'danger');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="bi bi-send-fill me-2"></i>Submit Izin Keluar';
+                return;
+            }
+
+            // Validasi waktu
+            if (formData.meninggalkanPukul >= formData.estimasiSelesaiPukul) {
+                showAlert('Waktu estimasi selesai harus setelah waktu meninggalkan!', 'danger');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="bi bi-send-fill me-2"></i>Submit Izin Keluar';
+                return;
+            }
+
+            const jumlahKelas = parseInt(formData.meninggalkanBerapaKelas);
+            const uploadPromises = [];
+
+            // Kumpulkan data untuk setiap kelas
+            for (let i = 1; i <= jumlahKelas; i++) {
+                const kelasData = {
+                    id_kelas: form[`kelas_id_diampuKe${i}`].value,
+                    deskripsi: form[`deskripsiTugasKe${i}`].value,
+                    linkTugas: form[`linkTugasKe${i}`].value
+                };
+
+                // Validasi setiap kelas
+                if (!kelasData.id_kelas || !kelasData.deskripsi || !kelasData.linkTugas) {
+                    showAlert(`Data untuk kelas ke-${i} belum lengkap!`, 'danger');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="bi bi-send-fill me-2"></i>Submit Izin Keluar';
+                    return;
+                }
+
+                formData[`kelas_id_diampuKe${i}`] = kelasData.id_kelas;
+                formData[`linkTugasKe${i}`] = kelasData.linkTugas;
+                formData[`deskripsiTugasKe${i}`] = kelasData.deskripsi;
+
+                // Handle file upload untuk kelas ini
+                const fileInput = document.querySelector(`[name="uploadFotoKe${i}"]`);
+                const file = fileInput.files[0];
+
+                if (file) {
+                    const uploadPromise = new Promise(async (resolve) => {
+                        try {
+                            const reader = new FileReader();
+                            reader.onload = async function(e) {
+                                const fileContent = e.target.result.split(',')[1];
+                                try {
+                                    const uploadResult = await apiCall('uploadFile', 'POST', {
+                                        fileContent: fileContent,
+                                        fileName: file.name,
+                                        mimeType: file.type
+                                    });
+                                    formData[`urlFotoKe${i}`] = uploadResult.data.url;
+                                    resolve();
+                                } catch (error) {
+                                    console.log('Error uploading file: ' + error.message);
+                                    formData[`urlFotoKe${i}`] = '';
+                                    resolve();
+                                }
+                            };
+                            reader.readAsDataURL(file);
+                        } catch (error) {
+                            console.log('Error reading file: ' + error.message);
+                            formData[`urlFotoKe${i}`] = '';
+                            resolve();
+                        }
+                    });
+                    uploadPromises.push(uploadPromise);
+                } else {
+                    formData[`urlFotoKe${i}`] = '';
+                }
+            }
+
+            // Tunggu semua file upload selesai sebelum menyimpan
+            if (uploadPromises.length > 0) {
+                showAlert('Mengupload file...', 'info');
+                await Promise.all(uploadPromises);
+            }
+            
+            // Simpan data form
+            try {
+                const result = await apiCall('saveIjinKeluar', 'POST', formData);
+                showAlert(result.message, 'success');
+                
+                const modal = new bootstrap.Modal(document.getElementById('submitSuccessModal'));
+                modal.show();
+                
+                // Reset form setelah submit
+                setTimeout(() => {
+                    document.getElementById('formIjinKeluar').reset();
+                    document.getElementById('kelasContainer').innerHTML = '';
+                    document.querySelectorAll('[id^="previewContainerKe"]').forEach(container => {
+                        container.style.display = 'none';
+                    });
+                }, 1000);
+                
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="bi bi-send-fill me-2"></i>Submit Izin Keluar';
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'danger');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="bi bi-send-fill me-2"></i>Submit Izin Keluar';
+            }
+        }
+        
+        function showAlert(message, type) {
+            const container = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} alert-dismissible fade show`;
+            alert.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            container.appendChild(alert);
+            
+            // Auto remove after 5 seconds
+            setTimeout(function() {
+                if (alert.parentNode) {
+                    alert.remove();
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
