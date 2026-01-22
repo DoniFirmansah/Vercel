@@ -94,6 +94,13 @@
         .modal-header.bg-success {
             background-color: #198754 !important;
         }
+
+        /* Style tambahan untuk checklist */
+        .checklist-container {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-left: 5px solid #0d6efd;
+        }
     </style>
 </head>
 
@@ -157,11 +164,30 @@
                             <select class="form-select" id="meninggalkanBerapaKelas" name="meninggalkanBerapaKelas">
                                 <option value="">Pilih Jumlah Kelas</option>
                             </select>
-                            <div class="form-text">Pilih jumlah kelas yang akan ditinggalkan</div>
+                            <div class="form-text">Pilih jumlah kelas yang akan ditinggalkan (0 jika tidak ada)</div>
                         </div>
                         
                         <div class="row mb-4" id="kelasContainer">
                             <!-- Kelas akan ditambahkan secara dinamis berdasarkan pilihan -->
+                        </div>
+
+                        <!-- Bagian Checklist Administrasi -->
+                        <div class="mb-4 p-3 checklist-container rounded">
+                            <h6 class="fw-bold mb-3 text-primary">
+                                <i class="bi bi-clipboard-check me-2"></i>Checklist Administrasi
+                            </h6>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="checkSetujuKS" name="checkSetujuKS" required>
+                                <label class="form-check-label" for="checkSetujuKS">
+                                    Izin ini telah <strong>Disetujui KS/Ka.TU</strong>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="checkBukuJurnal" name="checkBukuJurnal" required>
+                                <label class="form-check-label" for="checkBukuJurnal">
+                                    Saya telah / akan <strong>Mengisi buku jurnal keluar</strong>
+                                </label>
+                            </div>
                         </div>
                         
                         <div class="d-grid gap-2 mt-4">
@@ -314,7 +340,8 @@
         function generateJumlahKelasOptions() {
             const select = document.getElementById('meninggalkanBerapaKelas');
             select.innerHTML = '<option value="">Pilih Jumlah Kelas</option>';
-            for (let i = 1; i <= 9; i++) {
+            // Diubah dari 1 menjadi 0 untuk menambahkan opsi 0 Kelas
+            for (let i = 0; i <= 9; i++) {
                 const opt = document.createElement("option");
                 opt.value = i;
                 opt.textContent = `${i} Kelas`;
@@ -384,7 +411,8 @@
             const container = document.getElementById('kelasContainer');
             container.innerHTML = ''; 
             
-            if (!jumlahKelas || jumlahKelas === '') return;
+            // Jika kosong atau 0, jangan render apapun
+            if (!jumlahKelas || jumlahKelas === '' || parseInt(jumlahKelas) === 0) return;
 
             for (let i = 1; i <= parseInt(jumlahKelas); i++) {
                 const wrapper = document.createElement('div');
@@ -423,9 +451,10 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label required">Link Tugas</label>
+                            <label class="form-label">Link Tugas (Opsional)</label>
                             <input type="url" class="form-control" name="linkTugasKe${i}" 
-                                   placeholder="https://..." required />
+                                   placeholder="https://..." />
+                            <div class="form-text">Masukkan link tugas jika ada</div>
                         </div>
 
                         <div class="mb-3">
@@ -525,7 +554,10 @@
                 keperluan: form.keperluan.value,
                 meninggalkanPukul: form.meninggalkanPukul.value,
                 estimasiSelesaiPukul: form.estimasiSelesaiPukul.value,
-                meninggalkanBerapaKelas: form.meninggalkanBerapaKelas.value
+                meninggalkanBerapaKelas: form.meninggalkanBerapaKelas.value,
+                // Menambahkan data checkbox ke formData
+                checkSetujuKS: form.checkSetujuKS.checked,
+                checkBukuJurnal: form.checkBukuJurnal.checked
             };
 
             // Validasi dasar
@@ -544,10 +576,19 @@
                 return;
             }
 
+            // Validasi Checkbox (Browser validation usually handles this, but double check)
+            if (!formData.checkSetujuKS || !formData.checkBukuJurnal) {
+                showAlert('Mohon centang checklist administrasi sebelum submit.', 'danger');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="bi bi-send-fill me-2"></i>Submit Izin Keluar';
+                return;
+            }
+
             const jumlahKelas = parseInt(formData.meninggalkanBerapaKelas);
             const uploadPromises = [];
 
             // Kumpulkan data untuk setiap kelas
+            // Jika jumlahKelas 0, loop ini tidak akan berjalan
             for (let i = 1; i <= jumlahKelas; i++) {
                 const kelasData = {
                     id_kelas: form[`kelas_id_diampuKe${i}`].value,
@@ -555,9 +596,9 @@
                     linkTugas: form[`linkTugasKe${i}`].value
                 };
 
-                // Validasi setiap kelas
-                if (!kelasData.id_kelas || !kelasData.deskripsi || !kelasData.linkTugas) {
-                    showAlert(`Data untuk kelas ke-${i} belum lengkap!`, 'danger');
+                // Validasi setiap kelas (Link Tugas tidak wajib, jadi dihapus dari pengecekan)
+                if (!kelasData.id_kelas || !kelasData.deskripsi) {
+                    showAlert(`Data untuk kelas ke-${i} belum lengkap! Pastikan Kelas dan Deskripsi terisi.`, 'danger');
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = '<i class="bi bi-send-fill me-2"></i>Submit Izin Keluar';
                     return;
