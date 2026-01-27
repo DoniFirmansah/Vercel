@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     return;
   }
 
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyent4uhRIg9hehtUaCQp4Z2WlAb36c_jXTzhXlQRqX3akLIdlfIf37sYtPjHB5f5h6/exec';
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwQRGT1qicJQofnBikciDCYAlQPeSdm2PhvO4hzCT8bm_eqjzCrhmIBbL9IME5HLzDZ4w/exec';
 
   try {
     const { action, ...restParams } = req.method === 'GET' ? req.query : req.body;
